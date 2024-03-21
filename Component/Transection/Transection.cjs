@@ -3282,6 +3282,7 @@ module.exports.update_for_date_trans = async function (req, res) {
 module.exports.searchFamMaster = async function (req, res) {
   try {
      const{Fac,OwnerCC,FamFrom,FamTo,Dept,AssetCC,ReqType,FixCode,DateFrom,DateTo,ByID}=  req.body;
+     console.log(ByID,"ByID")
     const connect = await oracledb.getConnection(AVO);
     const query = `
     SELECT DISTINCT M.FACTORY_NAME AS FACTORY,
@@ -3312,8 +3313,9 @@ module.exports.searchFamMaster = async function (req, res) {
     AND ('${FixCode}' IS NULL OR C.FRD_ASSET_CODE IN (SELECT TRIM(REGEXP_SUBSTR('${FixCode}', '[^,]+', 1, LEVEL)) FROM DUAL CONNECT BY LEVEL <= REGEXP_COUNT('${FixCode}', ',') + 1))
     AND (TO_CHAR(T.FAM_REQ_DATE , 'YYYY-MM-DD') >= '${DateFrom}' OR '${DateFrom}' IS NULL)
     AND (TO_CHAR(T.FAM_REQ_DATE , 'YYYY-MM-DD') <= '${DateTo}' OR '${DateTo}' IS NULL)
-    AND (T.FAM_REQ_OWNER  = '${ByID}' OR '${ByID}' IS NULL) ORDER BY T.FRH_FAM_NO ASC  `
+    AND (T.FAM_REQ_BY = '${ByID}' OR '${ByID}' IS NULL) ORDER BY T.FRH_FAM_NO ASC  `
     ;
+    console.log(query,"qqqq")
     const result = await connect.execute(query);
     connect.release();
     res.json(result.rows);

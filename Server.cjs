@@ -10,6 +10,7 @@ app.use(express.json());
 const Login =require("./Component/Login/Login.cjs")
 const Transaction =require("./Component/Transection/Transection.cjs")
 const ReportSystem=require("./Component/report/Report_system.cjs")
+const VIEW_Fammaster =require("./Component/Monitoring/Monitorind.cjs")
 oracledb.initOracleClient({
     tnsnames: process.env.TNS_ADMIN,
   });

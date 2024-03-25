@@ -3044,6 +3044,7 @@ module.exports.deleteBOI_Maintain = async function (req, res) {
 module.exports.getCountTransfer = async function (req, res) {
   try {
     const userlogin = req.query.UserLogin;
+    console.log("uuuuu",userlogin)
     const connect = await oracledb.getConnection(AVO);
     const query = `
     SELECT  COUNT(T.FRH_FAM_NO)
@@ -3061,7 +3062,18 @@ module.exports.getCountTransfer = async function (req, res) {
         OR ( A.FRT_RECEIVE_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR009')
         OR (T.FAM_ACC_REC_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR010')
         OR (T.FAM_ACC_MGR_BY  = '${userlogin}' AND T.FAM_REQ_STATUS = 'FLTR011')
-        OR (T.FAM_SERVICE_CLOSE_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR012'))
+        OR (T.FAM_SERVICE_CLOSE_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR012')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR092')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR093')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR094')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR095')
+        OR (T.FAM_FM_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR096')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR907')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR908')
+        OR (T.FAM_REQ_BY   = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR909')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR910')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR911')
+        OR (T.FAM_REQ_BY  = '${userlogin}'  AND T.FAM_REQ_STATUS = 'FLTR912'))
        AND T.FAM_REQ_TYPE  = 'GP01001'
          `;
     // // // console.log(query);
@@ -3081,7 +3093,19 @@ module.exports.getCountTransferlistaLL = async function (req, res) {
     const connect = await oracledb.getConnection(AVO);
     const query = `
     SELECT
-    COUNT(CASE WHEN TT.FFM_CODE = 'FLTR001' THEN 1 ELSE NULL END) AS T_CREATE,
+    COUNT(CASE WHEN TT.FFM_CODE = 'FLTR001'
+    OR TT.FFM_CODE = 'FLTR092'
+    OR TT.FFM_CODE = 'FLTR093'
+    OR TT.FFM_CODE = 'FLTR094'
+    OR TT.FFM_CODE = 'FLTR095'
+    OR TT.FFM_CODE = 'FLTR096'
+    OR TT.FFM_CODE = 'FLTR907'
+    OR TT.FFM_CODE = 'FLTR908'
+    OR TT.FFM_CODE = 'FLTR909'
+    OR TT.FFM_CODE = 'FLTR910'
+    OR TT.FFM_CODE = 'FLTR911'
+    OR TT.FFM_CODE = 'FLTR912'
+    THEN 1 ELSE NULL END) AS T_CREATE,
     COUNT(CASE WHEN TT.FFM_CODE = 'FLTR002' THEN 1 ELSE NULL END) AS T_WAIT_DM,
     COUNT(CASE WHEN TT.FFM_CODE = 'FLTR003' THEN 1 ELSE NULL END) AS T_WAIT_SDC,
     COUNT(CASE WHEN TT.FFM_CODE = 'FLTR004' THEN 1 ELSE NULL END) AS T_WAIT_BOI_SC,
@@ -3101,17 +3125,29 @@ WHERE
     AND TT.FFM_STATUS = 'A'
     AND (
         HT.FAM_REQ_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR001'
-        OR HT.FAM_MGR_DEPT = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR002'
-        OR HT.FAM_SERVICE_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR003'
-        OR HT.FAM_BOI_CHK_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR004'
-        OR HT.FAM_BOI_MGR_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR005'
-        OR HT.FAM_FM_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR006'
-        OR HT.FAM_ACC_CHK_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR007'
-        OR HT.FAM_OWNER_SEND_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR008'
-        OR A.FRT_RECEIVE_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR009'
-        OR HT.FAM_ACC_REC_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR010'
-        OR HT.FAM_ACC_MGR_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR011'
-        OR HT.FAM_SERVICE_CLOSE_BY = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR012' )
+        OR (HT.FAM_MGR_DEPT = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR002')
+        OR (HT.FAM_SERVICE_BY  = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR003')
+        OR (HT.FAM_BOI_CHK_BY  = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR004')
+        OR (HT.FAM_BOI_MGR_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR005')
+        OR (HT.FAM_FM_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR006')
+        OR (HT.FAM_ACC_CHK_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR007')
+        OR (HT.FAM_OWNER_SEND_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR008')
+        OR ( A.FRT_RECEIVE_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR009')
+        OR (HT.FAM_ACC_REC_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR010')
+        OR (HT.FAM_ACC_MGR_BY  = '${userlogin}' AND HT.FAM_REQ_STATUS = 'FLTR011')
+        OR (HT.FAM_SERVICE_CLOSE_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR012')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR092')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR093')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR094')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR095')
+        OR (HT.FAM_FM_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR096')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR907')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR908')
+        OR (HT.FAM_REQ_BY   = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR909')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR910')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR911')
+        OR (HT.FAM_REQ_BY  = '${userlogin}'  AND HT.FAM_REQ_STATUS = 'FLTR912')
+        )
          `;
     // // // console.log(query);
     const result = await connect.execute(query);
@@ -3170,7 +3206,7 @@ WHERE T.EMPCODE = :owner_id
 module.exports.fix_code_find = async function (req, res) {
   try {
     
-    const { assetcode ,cc } = req.body;
+    const { assetcode } = req.body;
     const connect = await oracledb.getConnection(AVO);
     // console.log(assetcode,"assetcode")
     const query = `
@@ -3179,12 +3215,11 @@ module.exports.fix_code_find = async function (req, res) {
     F.FRD_COMP ,T.FAM_REQ_STATUS 
     FROM FAM_REQ_DETAIL F 
     LEFT JOIN FAM_REQ_HEADER T ON T.FRH_FAM_NO = F.FRD_FAM_NO 
-    WHERE F.FRD_ASSET_CODE  = :assetcode
-    AND F.FRD_COMP =:cc
+    WHERE F.FRD_ASSET_CODE  = :assetcode AND T.FAM_REQ_STATUS <> 'FLTR013'
+    ORDER BY FRD_COMP ASC
            `;
            const data = {
-            assetcode,
-            cc
+            assetcode
           };
           const result = await connect.execute(query, data, { autoCommit: true });
     
@@ -3334,6 +3369,30 @@ module.exports.namefile = async function (req, res) {
     const query = `
       SELECT FFA_FILE_SERVER  
       FROM FAM_FILE_ATTACH WHERE FFA_FAM_NO = '${fam_no}'
+           `;
+           console.log(query);  
+          const result = await connect.execute(query);
+    
+          connect.release();
+    // // // // console.log(result.rows);
+    res.json(result.rows);
+  } catch (error) {
+    // console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+  }
+};
+module.exports. find_asset_fixdata = async function (req, res) {
+  try {
+    console.log("เข้า")
+    const { assetcode } = req.body;
+    
+    const connect = await oracledb.getConnection(AVO);
+    // console.log(owner_id,"owner_id")
+    const query = `
+    SELECT  F.FRD_ASSET_CODE, F.FRD_COMP, T.FAM_REQ_STATUS
+    FROM FAM_REQ_DETAIL F
+    LEFT JOIN FAM_REQ_HEADER T ON T.FRH_FAM_NO = F.FRD_FAM_NO
+    WHERE F.FRD_ASSET_CODE = :assetcode AND T.FAM_REQ_STATUS <> 'FLTR013';
+    
            `;
            console.log(query);  
           const result = await connect.execute(query);

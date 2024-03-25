@@ -23,6 +23,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
 app.get("/Login", Login.login);
 app.get("/getmenu", Login.menu);
 app.get("/getmainmenu",Login.mainmenu);
@@ -73,6 +74,10 @@ app.post("/update_new_cc",Transaction.update_new_cc);
 app.post("/update_for_date_trans",Transaction.update_for_date_trans);
 app.post("/searchFamMaster",Transaction.searchFamMaster);
 app.post("/namefile",Transaction.namefile);
+app.post("/find_asset_fixdata",Transaction.find_asset_fixdata);
+
+
+
 //MAY 
 app.post("/ins_FILE_FROM_REQUEST", Transaction.insertFile_from_request); 
 app.get("/get_seq_request", Transaction.get_run_seq_request);
@@ -87,6 +92,7 @@ app.get("/getEdit_Trans",Transaction.getEdit_Trans);
 app.get("/getEdit_routing",Transaction.getEdit_routing);
 app.post("/Update_For_Req_All",Transaction.Update_For_Req_All);
 app.post("/Update_For_Trans_All",Transaction.Update_For_Trans_All);
+
 app.post("/delete_FAM_REQ_DETAIL",Transaction.delete_FAM_REQ_DETAIL);
 app.post("/getFixcode",Transaction.getFixcode);
 //delete all
@@ -96,6 +102,7 @@ app.post("/delect_all_fam_transfer",Transaction.delect_all_fam_transfer);
 app.post("/delete_all_file",Transaction.delete_all_file);
 // For File Delete 1 to 1
 app.post("/deletefile",Transaction.deletefile);
+
 // Update For Radio 
 app.post("/update_manager_dept",Transaction.update_manager_dept);
 app.post("/update_service_by",Transaction.update_service_by);
@@ -123,16 +130,20 @@ app.get("/getCountTransferlistaLL",Transaction.getCountTransferlistaLL);
 app.get("/getCountTransferlistaLLname",Transaction.getCountTransferlistaLLname);
 app.get("/getlevel",Transaction.level_person_maintain);
 app.get("/get_BOI_project_name",Transaction.get_BOI_project_name);
+
 app.post("/ins_PERSON_MAINTAIN",Transaction.insertPerson_Maintain);
 app.post("/update_PERSON_MAINTAIN",Transaction.updatePerson_Maintain);
 app.post("/dlt_PERSON_MAINTAIN",Transaction.deletePerson_Maintain);
 app.post("/ins_BOI_MAINTAIN",Transaction.insertBOI_Maintain);
 app.post("/update_BOI_MAINTAIN",Transaction.updateBOI_Maintain);
 app.post("/dlt_BOI_MAINTAIN",Transaction.deleteBOI_Maintain);
+
 //Report 
 app.post("/FamDetailReport",ReportSystem.getFamDetailReport)
 app.post("/RequstType",ReportSystem.getRequstType)
 app.post("/FAM_FILE_ATTACH",ReportSystem.getFAM_FILE_ATTACH)
+
+
 // VIEW Fammaster
 app.get("/getData_Hearder_show_VIEW",VIEW_Fammaster.getData_Hearder_show_VIEW);
 app.get("/getData_Detail_show_VIEW",VIEW_Fammaster.getData_Detail_show_VIEW);

@@ -28,7 +28,6 @@ const CUSR = {
   connectString: "TCIX01",
 };
 
-/// May
 module.exports.getFamDetailReport = async function (req, res) {
   try {
     // console.log("g-hllll")

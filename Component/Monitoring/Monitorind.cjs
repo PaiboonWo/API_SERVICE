@@ -1,42 +1,39 @@
 const express = require("express");
 const oracledb = require("oracledb");
-const multer = require("multer");
 const path = require("path");
-const uploadsPath = path.join(__dirname, "../uploads");
 const app = express();
-const port = 5000;
 app.use(express.json());
 
 oracledb.initOracleClient({
-   tnsnames: process.env.TNS_ADMIN,
-  });
+  tnsnames: process.env.TNS_ADMIN,
+ }); 
+ 
 
-  const AVO = {
-    user: "avo",
-    password: "avo",
-    connectString: "TCIX01",
-  };
-  
-  const QAD = {
-    user: "qad",
-    password: "qad",
-    connectString: "TCIX01",
-  };
-  
-  const CUSR = {
-    user: "cusr",
-    password: "cusr",
-    connectString: "TCIX01",
-  };
+const AVO = {
+  user: "avo",
+  password: "avo",
+  connectString: "TCIX01",
+};
+
+const QAD = {
+  user: "qad",
+  password: "qad",
+  connectString: "TCIX01",
+};
+
+const CUSR = {
+  user: "cusr",
+  password: "cusr",
+  connectString: "TCIX01",
+};
 
 
-  
-// getData_Hearder_show_VIEW
-module.exports.getData_Hearder_show_VIEW = async function (req, res) {
+  //แก้ API  หมดแล้ว
+  module.exports.getData_Hearder_show_VIEW = async (req, res) => {
     try {
-      const connection = await oracledb.getConnection(AVO);
-      const strFamno = req.query.FamNo;
-      const result = await connection.execute(`
+      const { famno } = req.body;
+      const connect = await oracledb.getConnection(AVO);
+      const query = `
       SELECT DISTINCT  T.FRH_FAM_NO,
       TO_CHAR(T.FAM_REQ_DATE, 'DD/MM/YYYY') AS FRT_PLAN_MOVE_DATE,
      R.USER_EMP_ID ||' : ' || R.USER_FNAME||' ' || R.USER_SURNAME AS REQ_BY,
@@ -59,52 +56,54 @@ module.exports.getData_Hearder_show_VIEW = async function (req, res) {
      LEFT JOIN CUSR.CU_USER_HUMANTRIX S  ON S.EMPCODE = T.FAM_REQ_OWNER 
      LEFT JOIN FAM_RUNNING_CONTROL FR ON T.FAM_ASSET_GROUP = FR.FRC_CHK_PREFIX 
      LEFT JOIN FAM_FLOW_MASTER FL ON FL.FFM_CODE  = T.FAM_REQ_STATUS 
-     WHERE T.FRH_FAM_NO = :famno
-    `, { famno: strFamno });
-    connection.release();
-    const rows = result.rows;
-    console.log(rows)
-    res.json(rows);
-    } catch (error) {
-      console.error("Error fetching department data:", error);
-      res.status(500).json({ error: "An error occurred" });
-    }
-  };
-
-  // getData_Detail_show_VIEW
-module.exports.getData_Detail_show_VIEW = async function (req, res) {
-    try {
-      const connection = await oracledb.getConnection(AVO);
-      const strFamno = req.query.FamNo;
-      const result = await connection.execute(`
-      SELECT 
-      FRD_FAM_NO,
-      FRD_ASSET_CODE,
-      FRD_COMP,
-      FRD_OWNER_CC,
-      FRD_ASSET_NAME,
-      FRD_BOI_PROJ,
-      FRD_QTY,
-      FRD_INV_NO,
-      FRD_ACQ_COST,
-      FRD_BOOK_VALUE
-      FROM FAM_REQ_DETAIL WHERE FRD_FAM_NO = :famno
-    `, { famno: strFamno });
-    connection.release();
-    const rows = result.rows;
-    console.log(rows)
-    res.json(rows);
-    } catch (error) {
-      console.error("Error fetching department data:", error);
-      res.status(500).json({ error: "An error occurred" });
-    }
-  };
+     WHERE T.FRH_FAM_NO = '${famno}'
+      `;
   
-  module.exports.getData_Routing_show_VIEW = async function (req, res) {
+      const result = await connect.execute(query);
+    
+      connect.release();
+      res.status(200).json(result.rows);
+      console.log(result.rows)
+    } catch (error) {
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "An error occurred while sending email" });
+    }
+  };
+  module.exports.getData_Detail_show_VIEW = async (req, res) => {
     try {
-      const connection = await oracledb.getConnection(AVO);
-      const strFamno = req.query.FamNo;
-      const result = await connection.execute(`
+      const { famno } = req.body;
+      const connect = await oracledb.getConnection(AVO);
+      const query = `
+      SELECT 
+            FRD_FAM_NO,
+            FRD_ASSET_CODE,
+            FRD_COMP,
+            FRD_OWNER_CC,
+            FRD_ASSET_NAME,
+            FRD_BOI_PROJ,
+            FRD_QTY,
+            FRD_INV_NO,
+            FRD_ACQ_COST,
+            FRD_BOOK_VALUE
+            FROM FAM_REQ_DETAIL WHERE FRD_FAM_NO = '${famno}'
+            ORDER BY 2,3
+      `;
+  
+      const result = await connect.execute(query);
+    
+      connect.release();
+      res.status(200).json(result.rows);
+      console.log(result.rows)
+    } catch (error) {
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "An error occurred while sending email" });
+    }
+  };
+  module.exports.getData_Routing_show_VIEW = async (req, res) => {
+    try {
+      const { famno } = req.body;
+      const connect = await oracledb.getConnection(AVO);
+      const query = `
       SELECT FAM_MGR_DEPT ,
       FAM_MGR_JUD,
       TO_CHAR(FAM_MGR_DATE, 'DD/MM/YYYY'),
@@ -146,69 +145,73 @@ module.exports.getData_Detail_show_VIEW = async function (req, res) {
       FAM_SERVICE_CLOSE_JUD,
       TO_CHAR(FAM_SERVICE_CLOSE_DATE, 'DD/MM/YYYY'),
       FAM_SERVICE_CLOSE_CMMT
-      FROM FAM_REQ_HEADER WHERE FRH_FAM_NO = :FAM
-    `, { FAM: strFamno });
-    connection.release();
-    const rows = result.rows;
-    console.log(rows)
-    res.json(rows);
+      FROM FAM_REQ_HEADER WHERE FRH_FAM_NO = '${famno}'
+      `;
+  
+      const result = await connect.execute(query);
+    
+      connect.release();
+      res.status(200).json(result.rows);
+      console.log(result.rows)
     } catch (error) {
-      console.error("Error fetching department data:", error);
-      res.status(500).json({ error: "An error occurred" });
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "An error occurred while sending email" });
     }
   };
-  module.exports.getData_Transfer_show_VIEW = async function (req, res) {
+  module.exports.getData_Transfer_show_VIEW = async (req, res) => {
     try {
-      const connection = await oracledb.getConnection(AVO);
-      const strFamno = req.query.FamNo;
-      const result = await connection.execute(`
+      const { famno } = req.body;
+      const connect = await oracledb.getConnection(AVO);
+      const query = `
       SELECT F.FRT_FROM_PROJ,
-      M.FACTORY_NAME AS FACTORYNAME,
-      F.FRT_TO_CC,
-      F.FRT_TO_PROJ,
-      R.USER_EMP_ID ||' : ' || R.USER_FNAME||' ' || R.USER_SURNAME AS NEW_OWNER,
-      F.FRT_RECEIVER_TEL,
-      TO_CHAR(F.FRT_PLAN_MOVE_DATE, 'DD/MM/YYYY') AS FRT_PLAN_MOVE_DATE,
-      F.FRT_ABNORMAL_REASON,
-      F.FRT_RECEIVE_BY AS RECEIVER,
-      F.FRT_RECEIVER_JUD,
-      TO_CHAR(F.FRT_RECEIVE_DATE, 'DD/MM/YYYY') AS FRT_PLAN_MOVE_DATE,
-      FRT_RECEIVE_CMMT
-      FROM FAM_REQ_TRANSFER F
-      LEFT JOIN CUSR.CU_FACTORY_M M ON  M.FACTORY_CODE  =  F.FRT_TO_FACTORY
-      LEFT JOIN CUSR.CU_USER_M R ON R.USER_LOGIN = F.FRT_RECEIVE_BY
-      WHERE FRT_FAM_NO = :FAM
-    `, { FAM: strFamno });
-    connection.release();
-    const rows = result.rows;
-    console.log(rows)
-    res.json(rows);
+       M.FACTORY_NAME AS FACTORYNAME,
+       F.FRT_TO_CC,
+       F.FRT_TO_PROJ,
+       R.USER_EMP_ID ||' : ' || R.USER_FNAME||' ' || R.USER_SURNAME AS NEW_OWNER,
+       F.FRT_RECEIVER_TEL,
+       TO_CHAR(F.FRT_PLAN_MOVE_DATE, 'DD/MM/YYYY') AS FRT_PLAN_MOVE_DATE,
+       F.FRT_ABNORMAL_REASON,
+       F.FRT_RECEIVE_BY AS RECEIVER,
+       F.FRT_RECEIVER_JUD,
+       TO_CHAR(F.FRT_RECEIVE_DATE, 'DD/MM/YYYY') AS FRT_PLAN_MOVE_DATE,
+       FRT_RECEIVE_CMMT
+       FROM FAM_REQ_TRANSFER F
+       LEFT JOIN CUSR.CU_FACTORY_M M ON  M.FACTORY_CODE  =  F.FRT_TO_FACTORY
+       LEFT JOIN CUSR.CU_USER_M R ON R.USER_LOGIN = F.FRT_RECEIVE_BY
+       WHERE FRT_FAM_NO = '${famno}'
+      `;
+  
+      const result = await connect.execute(query);
+    
+      connect.release();
+      res.status(200).json(result.rows);
+      console.log(result.rows)
     } catch (error) {
-      console.error("Error fetching department data:", error);
-      res.status(500).json({ error: "An error occurred" });
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "An error occurred while sending email" });
     }
   };
-
-  module.exports.getData_showName = async function (req, res) {
+  module.exports.getData_showName = async (req, res) => {
     try {
-      console.log("FFFFFF")
-      const connection = await oracledb.getConnection(AVO);
-      const strFamno = req.query.FamNo;
-
-      const result = await connection.execute(`
+      const { famno } = req.body;
+      const connect = await oracledb.getConnection(AVO);
+      const query = `
       SELECT
-      S.ENAME || '  ' || S.ESURNAME AS NAME_SURNAME 
-      FROM FAM_REQ_HEADER T 
-      LEFT JOIN CUSR.CU_USER_HUMANTRIX S  ON S.EMPCODE = T.FAM_REQ_OWNER 
-      WHERE T.FRH_FAM_NO = :FAM
-    `, { FAM: strFamno });
-    connection.release();
-    console.log(result,"result",strFamno)
-    const rows = result.rows;
-    console.log(rows)
-    res.json(rows);
+           S.ENAME || '  ' || S.ESURNAME AS NAME_SURNAME 
+           FROM FAM_REQ_HEADER T 
+           LEFT JOIN CUSR.CU_USER_HUMANTRIX S  ON S.EMPCODE = T.FAM_REQ_OWNER 
+           WHERE T.FRH_FAM_NO = '${famno}'
+      `;
+  
+      const result = await connect.execute(query);
+    
+      connect.release();
+      res.status(200).json(result.rows);
+      console.log(result.rows)
     } catch (error) {
-      console.error("Error fetching department data:", error);
-      res.status(500).json({ error: "An error occurred" });
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "An error occurred while sending email" });
     }
   };
+
+   
